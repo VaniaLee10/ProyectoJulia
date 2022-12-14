@@ -1,29 +1,41 @@
 <?php
-
   session_start();
+  
+  $username = '';
+  $contrasena = '';
 
-  if (isset($_SESSION['user_id'])) {
-    header("Location: home.php");
+  if(isset($_POST['username'])&&isset($_POST['password'])){
+      $username = $_POST['username'];
+      $password = $_POST['password'];
   }
-  require 'database.php';
-
-  if (!empty($_POST['email']) && !empty($_POST['password'])) {
-    $records = $conn->prepare('SELECT id, email, password FROM users WHERE email = :email');
-    $records->bindParam(':email', $_POST['email']);
-    $records->execute();
-    $results = $records->fetch(PDO::FETCH_ASSOC);
-
-    $message = '';
-
-    if (count($results) > 0 && password_verify($_POST['password'], $results['password'])) {
-      $_SESSION['user_id'] = $results['id'];
-      header("Location: home.php");
-    } else {
-      $message = 'Sorry, those credentials do not match';
-    }
+  $conexion=mysqli_connect('localhost','root','','mydb');
+  if(!$conexion){
+      die("Error al conectarse a la base de datos: ".mysqli_connect_error());
   }
 
+  $ConsultaUsuario = "SELECT * FROM maestro 
+                  WHERE nombre_maestro = '".$username."' AND contrasena_maestro='".$password."'";
+  //echo $ConsultaUsuario;
+
+  $ResultadoUsuario = mysqli_query($conexion, $ConsultaUsuario);
+  //echo $ResultadoUsuario;
+
+  if (mysqli_num_rows($ResultadoUsuario)>0){
+    $Renglon = mysqli_fetch_assoc($ResultadoUsuario);            
+    $_SESSION['username']=$username;
+    $_SESSION['login']=1;
+    header('Location: materias.php');
+  }else{
+    //echo "Usuario y/o  contrasena Incorrectos";
+    $_SESSION['login']=0;
+  }
+
+  //echo "Parametros por POST: ";
+  //print_r($_POST);
+    
 ?>
+
+
 <!DOCTYPE html>
 <html
   lang="en"
@@ -88,7 +100,7 @@
             <div class="card-body">
               <!-- Logo -->
               <div class="app-brand justify-content-center">
-                <a href="materias.html" class="app-brand-link gap-2">
+                <a href="materias.php" class="app-brand-link gap-2">
                   <span class="app-brand-logo demo">
                     <svg
                       width="25"
@@ -149,26 +161,26 @@
               </div>
               <!-- /Logo -->
               <h4 class="mb-2">¡Bienvenido al Sistema Escolar! </h4>
-              <p class="mb-4">Por favor ingresa con la cuenta y contraseña asignada</p>
+              <p class="mb-4">Por favor ingresa con la cuenta y contrasena asignada</p>
 
-              <form id="formAuthentication" class="mb-3" action="materias.html" method="POST">
+              <form id="formAuthentication" class="mb-3" action="login.php" method="POST">
                 <div class="mb-3">
-                  <label for="email" class="form-label">Cuenta</label>
+                  <label for="username" class="form-label">Cuenta</label>
                   <input
                     type="text"
                     class="form-control"
-                    id="email"
-                    name="email-username"
+                    id="username"
+                    name="username"
                     placeholder="Ingresa la cuenta asginada"
                     autofocus
                   />
                 </div>
                 <div class="mb-3 form-password-toggle">
                   <div class="d-flex justify-content-between">
-                    <label class="form-label" for="password" placeholder="Contraseña">Contraseña</label>
+                    <label class="form-label" for="password" >Contraseña</label>
            
                     <a href="auth-forgot-password-basic.html">
-                      <small>¿Olvidaste la contraseña?</small>
+                      <small>¿Olvidaste la contrasena?</small>
                     </a>
                   </div>
                   <div class="input-group input-group-merge">

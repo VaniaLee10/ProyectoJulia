@@ -1,9 +1,11 @@
 <?php
-  session_start();
+    session_start();
 
-  session_unset();
+    if (isset($_POST['login'])&&isset($_POST['username'])) {
+        unset($_SESSION['login']);
+        unset($_SESSION['username']);
+        unset($_SESSION['password']);
+    }
+    header('Location: login.php');
 
-  session_destroy();
-
-  header('Location: login.php');
 ?>
