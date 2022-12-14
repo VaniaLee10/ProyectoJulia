@@ -27,7 +27,7 @@
       content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
 
-    <title>Dashboard - Analytics | Sneat - Bootstrap 5 HTML Admin Template - Pro</title>
+    <title>Planeaciones - Maestro</title>
 
     <meta name="description" content="" />
 
@@ -346,13 +346,21 @@
                             </div>
                             <div class="tab-content px-0 mt-0">
                               <div class="tab-pane fade show active" id="horizontal-Planeaciones">
-                                <h1>Planeacion por maestro:</h1>
-                                 <br>
-                                 Materia:
-                                <input type="text" class="form-control" id="defaultFormControlInput" placeholder="John Doe" aria-describedby="defaultFormControlHelp">
-                                Grupo:
-                                <input type="text" class="form-control" id="defaultFormControlInput" placeholder="John Doe" aria-describedby="defaultFormControlHelp">
-                           
+                                <h1>Planeación por Maestro:</h1>
+                                <!--<input type="text" style="width : 1px; heigth : 1px">-->
+                                <div class="mb-3 row">
+                                <label for="materiaId" class="col-md-2 col-form-label">Materia : </label> 
+                                <div class="col-md-3">
+                                  <input type="text" style="width : 500px" class="form-control" id="materiaId" placeholder="Materia 1" aria-describedby="materiaId" disabled>
+                                </div>
+                              </div>
+                                <div class="mb-3 row">
+                                <label for="grupoId" class="col-md-2 col-form-label">Grupo : </label> 
+                                <div class="col-md-3">
+                                  <input type="text" style="width : 500px" class="form-control" id="grupoId" placeholder="Grupo 1" aria-describedby="grupoId" disabled>
+                                </div>
+                              </div>
+
                               <div class="mb-3 row">
                                 <label for="html5-date-input" class="col-md-2 col-form-label">Fecha de inicio:</label>
                                 <div class="col-md-3">
@@ -370,24 +378,22 @@
                                 <div class="card">
                                   <div class="table-responsive text-nowrap">
                                   <h5>Martes 08/11/2022</h5>
-                                    <center>
-                                        </center><table class="table table-borderless">
+
+                                    <table class="table table-borderless">
                                       <thead>
                                         <tr>
-                                          <th>Materia</th>
                                           <th>Actividades</th>
-                                          
+                                          <th>Recursos</th>
                                         </tr>
                                       </thead>
                                       <tbody>
                                         <tr>
-                                          <td><i class="fab fa-angular fa-lg text-danger me-2"></i> <strong>Matematicas</strong></td>
                                           <td>Cuestionario</td>
-                
+                                          <td>Material por defecto</td>
                                         </tr>
-                                        
                                       </tbody>
                                     </table>
+
                                   </div>
                                 </div>
                               </div>
@@ -397,25 +403,23 @@
                               <div class="col-md-8">
                                 <div class="card">
                                   <div class="table-responsive text-nowrap">
-                                  <h5>Miercoles 09/11/2022</h5>
-                                    <center>
-                                        </center><table class="table table-borderless">
-                                      <thead>
-                                        <tr>
-                                          <th>Materia</th>
-                                          <th>Actividades</th>
-                                          
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                        <tr>
-                                          <td><i class="fab fa-angular fa-lg text-danger me-2"></i> <strong>Español</strong></td>
-                                          <td>Cuadernillo</td>
-                
-                                        </tr>
-                                        
-                                      </tbody>
-                                    </table>
+                                  <h5>Miércoles 09/11/2022</h5>
+                                    
+                                  <table class="table table-borderless">
+                                    <thead>
+                                      <tr>
+                                        <th>Actividades</th>
+                                        <th>Recursos</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      <tr>
+                                        <td>Cuestionario</td>
+                                        <td>Material por defecto</td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                    
                                   </div>
                                 </div>
                               </div>
@@ -425,24 +429,22 @@
                                 <div class="card">
                                   <div class="table-responsive text-nowrap">
                                   <h5>Jueves 10/11/2022</h5>
-                                    <center>
-                                        </center><table class="table table-borderless">
-                                      <thead>
-                                        <tr>
-                                          <th>Materia</th>
-                                          <th>Actividades</th>
-                                          
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                        <tr>
-                                          <td><i class="fab fa-angular fa-lg text-danger me-2"></i> <strong>Quimica</strong></td>
-                                          <td>Formulario</td>
-                
-                                        </tr>
-                                        
-                                      </tbody>
-                                    </table>
+                                    
+                                  <table class="table table-borderless">
+                                    <thead>
+                                      <tr>
+                                        <th>Actividades</th>
+                                        <th>Recursos</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      <tr>
+                                        <td>Cuestionario</td>
+                                        <td>Material por defecto</td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+
                                   </div>
                                 </div>
                               </div>  
@@ -544,15 +546,15 @@
                                   </div>
                                   <br><br><br>
                                 </div> 
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exLargeModa">
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#edit">
                                   Agregar
                                 </button>
                               </div>
                               <div class="tab-pane fade" id="horizontal-Evaluaciones">
                                 <div class="card">
                             
-                                  <h6 class="card-header">Materia: Materia 1</h6>
-                                  <h6 class="card-header">Grupo: Grupo 1</h6>
+                                  <h6 class="card-header">Materia: <input type="text" class="form-control" id="defaultFormControlInput" placeholder="Materia 1" aria-describedby="defaultFormControlHelp" disabled> </h6>
+                                  <h6 class="card-header">Grupo: <input type="text" class="form-control" id="defaultFormControlInput" placeholder="Grupo 1" aria-describedby="defaultFormControlHelp" disabled> </h6>
                                   <div class="table-responsive text-nowrap">
                                     <table class="table">
                                       <thead class="table-light">
@@ -618,11 +620,11 @@
                               <div class="tab-pane fade" id="horizontal-Asistencia">
                                 <div class="card">
                             
-                                  <h6 class="card-header">Materia: Materia 1</h6>
-                                  <h6 class="card-header">Grupo: Grupo 1</h6>
-                                  <h6 class="card-header">A - Asistencia</h6>
-                                  <h6 class="card-header">F - Falta</h6>
-                                  <h6 class="card-header">R - Retardo</h6>
+                                  <h6 class="card-header">Materia: <input type="text" class="form-control" id="defaultFormControlInput" placeholder="Materia 1" aria-describedby="defaultFormControlHelp" disabled> </h6>
+                                  <h6 class="card-header">Grupo: <input type="text" class="form-control" id="defaultFormControlInput" placeholder="Grupo 1" aria-describedby="defaultFormControlHelp" disabled> </h6>
+                                  <h6 class="card-header">A - Asistencia,     F - Falta,     R - Retardo
+                                  </h6>
+                                  
                                   <div class="table-responsive text-nowrap">
                                     <table class="table">
                                       <thead class="table-light">

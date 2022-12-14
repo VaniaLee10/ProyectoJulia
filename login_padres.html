@@ -17,7 +17,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 
-    <title>Login Padres</title>
+    <title>Login - Padres</title>
     
     <meta name="description" content="Most Powerful &amp; Comprehensive Bootstrap 5 HTML Admin Dashboard Template built for developers!" />
     <meta name="keywords" content="dashboard, bootstrap 5 dashboard, bootstrap 5 design, bootstrap 5">
@@ -126,35 +126,47 @@
             </a>
           </div>
           <!-- /Logo -->
-          <h4 class="mb-2">Iniciar Sesión</h4>
-          <!--<p class="mb-4">Porfavor ingresa tu cuenta</p>-->
+          <h4 class="mb-2">¡Bienvenido al Sistema Escolar! </h4>
+          <p class="mb-4">Por favor ingresa con la cuenta y contraseña asignada</p>
 
           <form id="formAuthentication" class="mb-3" action="hijos_padres.html" method="POST">
             <div class="mb-3">
-              <label for="Username" class="form-label">Usuario</label>
-              <input type="text" class="form-control" id="Username" name="Username" placeholder="Username" autofocus>
+              <label for="email" class="form-label">Cuenta</label>
+              <input
+                type="text"
+                class="form-control"
+                id="email"
+                name="email-username"
+                placeholder="Ingresa la cuenta asginada"
+                autofocus
+              />
             </div>
             <div class="mb-3 form-password-toggle">
               <div class="d-flex justify-content-between">
-                <label class="form-label" for="password">Contraseña</label>
+                <label class="form-label" for="password" placeholder="Contraseña">Contraseña</label>
+       
+                <a href="auth-forgot-password-basic.html">
+                  <small>¿Olvidaste la contraseña?</small>
+                </a>
               </div>
               <div class="input-group input-group-merge">
-                <input type="password" id="password" class="form-control" name="password" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="password" />
+                <input
+                  type="password"
+                  id="password"
+                  class="form-control"
+                  name="password"
+                  placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+                  aria-describedby="password"
+                />
                 <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
               </div>
             </div>
+        
             <div class="mb-3">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="remember-me">
-                <label class="form-check-label" for="remember-me">
-                  Recordarme en este dispositivo
-                </label>
-              </div>
-            </div>
-            <div class="mb-3">
-              <button class="btn btn-primary d-grid w-100" type="submit">Sign in</button>
+              <button class="btn btn-primary d-grid w-100" type="submit">Ingresar</button>
             </div>
           </form>
+          
         </div>
       </div>
       <!-- /Register -->
