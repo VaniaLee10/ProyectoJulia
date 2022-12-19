@@ -1,19 +1,32 @@
 <?php
-    session_start();
+  session_start();
 
-    //1. Establecer la conexion a la base de datos
-    if($_SESSION['login']=='0'){
-        header('Location: login.php');
-    }
+  //1. Establecer la conexion a la base de datos
+  if($_SESSION['login']=='0'){
+      header('Location: logout.php');
+  }
 
     $Conexion=mysqli_connect('localhost','root','','mydb');
 
-    //1.1 Verificar que se pudo conectar a la base de datos
-    if(!$Conexion){
-        die("Error al conectarse a la base de datos: ".mysqli_connect_error());
-    }
+  //1.1 Verificar que se pudo conectar a la base de datos
+  if(!$Conexion){
+      die("Error al conectarse a la base de datos: ".mysqli_connect_error());
+  }
     
+  //2. Definimos la consulta a la base de datos
+  $ConsultaMaterias = "SELECT `materias`.*, `maestro`.*, `grupoymateria`.*
+    FROM `materias`, `maestro` 
+    LEFT JOIN `grupoymateria` ON `grupoymateria`.`Maestro_idMaestro` = `maestro`.`idMaestro`
+    WHERE `grupoymateria`.`Maestro_idMaestro` = '".$_SESSION['id_usuario']."' AND grupoymateria.Materias_idMaterias = materias.idMaterias;";
+
+  //3. Ejecutamos la consulta
+  $ResultadoMaterias = mysqli_query($Conexion, $ConsultaMaterias);
+    
+  //echo "Parametros por POST: ";
+  //print_r($_POST);
+  //print_r($_SESSION);
 ?>
+
 
 
 <!DOCTYPE html>
@@ -271,7 +284,7 @@
                       <div class="dropdown-divider"></div>
                     </li>
                     <li>
-                      <a class="dropdown-item" href="login.php">
+                      <a class="dropdown-item" href="logout.php">
                         <i class="bx bx-power-off me-2"></i>
                         <span class="align-middle">Salir</span>
                       </a>
@@ -292,92 +305,30 @@
             <div class="container-xxl flex-grow-1 container-p-y">
               <div class="row">
                 <!-- Materia 1-->
-                <div class="col-md-6 col-lg-4 mb-3">
-                  <div class="card h-100">
-                    <img class="card-img-top" src="assets/img/elements/2.jpg" alt="Card image cap">
-                    <div class="card-body">
-                      <h5 class="card-title">Materia 1</h5>
-                      <p class="card-text">
+
+              <?php
+                $idMaterias = 0;
+                while($RegistroMaterias = mysqli_fetch_assoc($ResultadoMaterias)){
+                  //echo $idMaterias." ";
+                  //echo "De la base de datos".$RegistroMaterias['idMaterias']." ";
+                  if ($RegistroMaterias['idMaterias'] != $idMaterias) {
+                    $idMaterias = $RegistroMaterias['idMaterias'];
+                    echo '<div class="col-md-6 col-lg-4 mb-3">';
+                    echo '<div class="card h-100">';
+                      echo '<img class="card-img-top" src="assets/img/elements/2.jpg" alt="Card image cap">';
+                      echo '<div class="card-body">';
+                        echo '<h5 class="card-title">'.$RegistroMaterias['nombre_materia'].'</h5>';
+                        echo '<p class="card-text">';
                        
-                      </p>
-                      <a  class="btn btn-outline-primary" href="grupos.html">Ver detalles</a>
-                    </div>
-                  </div>
-                </div>
-                <!-- Materia 1-->
-                <!-- Materia 2-->
-                <div class="col-md-6 col-lg-4 mb-3">
-                  <div class="card h-100">
-                    <img class="card-img-top" src="assets/img/elements/2.jpg" alt="Card image cap">
-                    <div class="card-body">
-                      <h5 class="card-title">Materia 2</h5>
-                      <p class="card-text">
-                       
-                      </p>
-                      <a href="javascript:void(0)" class="btn btn-outline-primary">Ver detalles</a>
-                    </div>
-                  </div>
-                </div>
-                <!-- Materia 2-->
-                <!-- Materia 3-->
-                <div class="col-md-6 col-lg-4 mb-3">
-                  <div class="card h-100">
-                    <img class="card-img-top" src="assets/img/elements/2.jpg" alt="Card image cap">
-                    <div class="card-body">
-                      <h5 class="card-title">Materia 3</h5>
-                      <p class="card-text">
-                       
-                      </p>
-                      <a href="javascript:void(0)" class="btn btn-outline-primary">Ver detalles</a>
-                    </div>
-                  </div>
-                </div>
-                <!-- Materia 3-->
-                <!-- Materia 4-->
-                <div class="col-md-6 col-lg-4 mb-3">
-                  <div class="card h-100">
-                    <img class="card-img-top" src="assets/img/elements/2.jpg" alt="Card image cap">
-                    <div class="card-body">
-                      <h5 class="card-title">Materia 4</h5>
-                      <p class="card-text">
-                      </p>
-                      <a href="javascript:void(0)" class="btn btn-outline-primary">Ver detalles</a>
-                    </div>
-                  </div>
-                </div>
-                <!-- Materia 4-->
-                <!-- Materia 5-->
-                <div class="col-md-6 col-lg-4 mb-3">
-                  <div class="card h-100">
-                    <img class="card-img-top" src="assets/img/elements/2.jpg" alt="Card image cap">
-                    <div class="card-body">
-                      <h5 class="card-title">Materia 5</h5>
-                      <p class="card-text">
-                      </p>
-                      <a href="javascript:void(0)" class="btn btn-outline-primary">Ver detalles</a>
-                    </div>
-                  </div>
-                </div>
-                <!-- Materia 5-->
-                <!-- Materia 6-->
-                <div class="col-md-6 col-lg-4 mb-3">
-                  <div class="card h-100">
-                    <img class="card-img-top" src="assets/img/elements/2.jpg" alt="Card image cap">
-                    <div class="card-body">
-                      <h5 class="card-title">Materia 6</h5>
-                      <p class="card-text">
-                      </p>
-                      <a href="javascript:void(0)" class="btn btn-outline-primary">Ver detalles</a>
-                    </div>
-                  </div>
-                </div>
-                <!-- Materia 6-->
-                <div class="col-lg-4 col-md-4 order-1">
-                  <div class="row">
-                    
-                    
-                  </div>
-                </div>
+                        echo '</p>';
+                        echo '<a  class="btn btn-outline-primary" href="grupos.php?idMaterias='.$idMaterias.'"">Ver grupos</a>';
+                      echo '</div>';
+                    echo '</div>';
+                  echo '</div>';
+                  }
+                }
+              ?>
+                
                 <!-- Total Revenue -->
                 
                 <!--/ Total Revenue -->

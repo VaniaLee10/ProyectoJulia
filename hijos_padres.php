@@ -13,30 +13,22 @@
       die("Error al conectarse a la base de datos: ".mysqli_connect_error());
   }
 
-  $idMaterias = $_GET['idMaterias'];
-
   //2. Definimos la consulta a la base de datos
-  $ConsultaGrupos = "SELECT `grupo`.*, `grupoymateria`.*, `materias`.*, `maestro`.* FROM `grupo` 
-    LEFT JOIN `grupoymateria` ON `grupoymateria`.`Grupo_idGrupo` = `grupo`.`idGrupo` 
-    LEFT JOIN `materias` ON `grupoymateria`.`Materias_idMaterias` = `materias`.`idMaterias` 
-    LEFT JOIN `maestro` ON `grupoymateria`.`Maestro_idMaestro` = `maestro`.`idMaestro`
-    WHERE grupoymateria.Materias_idMaterias = '".$idMaterias."' AND `grupoymateria`.`Maestro_idMaestro` = '".$_SESSION['id_usuario']."' AND grupoymateria.Grupo_idGrupo = grupo.idGrupo;";
+  $ConsultaPadre = "SELECT `padre`.*, `tutorado`.*, `alumno`.* FROM `padre` 
+    LEFT JOIN `tutorado` ON `tutorado`.`Padre_idPadre` = `padre`.`idPadre` 
+    LEFT JOIN `alumno` ON `tutorado`.`Alumno_idAlumno` = `alumno`.`idAlumno`
+    WHERE padre.idPadre = '".$_SESSION['id_usuario']."';";
   
-  $ConsultaMaterias = "SELECT `materias`.*, `maestro`.*, `grupoymateria`.* FROM `materias`, `maestro` 
-    LEFT JOIN `grupoymateria` ON `grupoymateria`.`Maestro_idMaestro` = `maestro`.`idMaestro`
-    WHERE `grupoymateria`.`Maestro_idMaestro` = '".$_SESSION['id_usuario']."' AND grupoymateria.Materias_idMaterias = materias.idMaterias;";
-
   //3. Ejecutamos la consulta
-  $ResultadoGrupos = mysqli_query($Conexion, $ConsultaGrupos);
-
-  $ResultadoMaterias = mysqli_query($Conexion, $ConsultaMaterias);
+  $ResultadoPadre = mysqli_query($Conexion, $ConsultaPadre);
+  //print_r($ResultadoPadre);
     
   //echo "Parametros por POST: ";
   //print_r($_POST);
   //print_r($_SESSION);
   //print_r($_GET);
+    
 ?>
-
 
 <!DOCTYPE html>
 
@@ -67,7 +59,7 @@
       content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
 
-    <title>Grupos - Maestros</title>
+    <title>Dashboard - Analytics | Sneat - Bootstrap 5 HTML Admin Template - Pro</title>
 
     <meta name="description" content="" />
 
@@ -169,7 +161,7 @@
                   </g>
                 </svg>
               </span>
-              <span class="app-brand-text demo menu-text fw-bolder ms-2">Grupos</span>
+              <span class="app-brand-text demo menu-text fw-bolder ms-2">Padres </span>
             </a>
 
             <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
@@ -181,23 +173,13 @@
 
           <ul class="menu-inner py-1">
             <!-- Dashboard -->
-            <?php
-              $idMaterias = 0;
-              while($RegistroMaterias = mysqli_fetch_assoc($ResultadoMaterias)){
-                //echo $idMaterias." ";
-                //echo "De la base de datos".$RegistroMaterias['idMaterias']." ";
-                if ($RegistroMaterias['idMaterias'] != $idMaterias) {
-                  $idMaterias = $RegistroMaterias['idMaterias'];
-                  echo '<li class="menu-item">';
-                    echo '<a href="grupos.php?idMaterias='.$idMaterias.'"" class="menu-link">';
-                      echo '<i class="menu-icon tf-icons bx bx-collection"></i>';
-                      echo '<div data-i18n="Basic">'.$RegistroMaterias['nombre_materia'].'</div>';
-                    echo '</a>';                       
-                  echo '</li>';
-                }
-              }
-            ?>
-            
+            <li class="menu-item active">
+              <a href="hijos_padres.php" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                <div data-i18n="Analytics"> Alumnos del tutor</div>
+              </a>
+            </li>
+          </ul>
             <!-- Layouts -->
            
 
@@ -277,8 +259,7 @@
                             </div>
                           </div>
                           <div class="flex-grow-1">
-                            <span class="fw-semibold d-block">Grupos
-                            </span>
+                            <span class="fw-semibold d-block">Padre</span>
                             <small class="text-muted">Admin</small>
                           </div>
                         </div>
@@ -304,7 +285,7 @@
                       <div class="dropdown-divider"></div>
                     </li>
                     <li>
-                      <a class="dropdown-item" href="logout.php">
+                      <a class="dropdown-item" href="login.php">
                         <i class="bx bx-power-off me-2"></i>
                         <span class="align-middle">Salir</span>
                       </a>
@@ -324,24 +305,25 @@
 
             <div class="container-xxl flex-grow-1 container-p-y">
               <div class="row">
-
-              <?php
-                while($RegistroGrupos = mysqli_fetch_assoc($ResultadoGrupos)){
-                  echo '<div class="col-md-6 col-lg-4 mb-3">';
-                  echo '<div class="card h-100">';
-                    echo '<img class="card-img-top" src="assets/img/elements/2.jpg" alt="Card image cap">';
-                    echo '<div class="card-body">';
-                      echo '<h5 class="card-title">'.$RegistroGrupos['idGrupo'].'</h5>';
-                      echo '<p class="card-text">';
-                       
-                      echo '</p>';
-                      echo '<a href="planeaciones.php?idMaterias='.$idMaterias.'&idGrupo='.$RegistroGrupos['idGrupo'].'&idGrupoYMateria='.$RegistroGrupos['idGrupoYMateria'].'"" class="btn btn-outline-primary" >Ver detalles</a>';
-                    echo '</div>';
-                  echo '</div>';
-                echo '</div>';
-                }
-              ?>
-
+                <!-- Materia 1-->
+                <?php
+                    while($RegistroPadre = mysqli_fetch_assoc($ResultadoPadre)){
+                      echo '<div class="col-md-6 col-lg-4 mb-3">';
+                        echo '<div class="card h-100">';
+                            echo '<img class="card-img-top" src="assets/img/elements/2.jpg" alt="Card image cap">';
+                            echo '<div class="card-body">';
+                                echo '<h5 class="card-title">'.$RegistroPadre['nombre_alumno'].'</h5>';
+                                echo '<p class="card-text">';
+                                echo '</p> <a href="planeaciones_padres.php?idAlumno='.$RegistroPadre['idAlumno'].'" class="btn btn-outline-primary" >Ver detalles</a>';
+                            echo '</div>';
+                        echo '</div>';
+                      echo '</div>';
+                    }
+                ?>
+                <!-- Materia 1-->
+                <!-- Materia 2-->
+                </div>
+                </div>
                 <!-- Total Revenue -->
                 
                 <!--/ Total Revenue -->

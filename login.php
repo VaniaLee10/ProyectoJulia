@@ -1,8 +1,9 @@
 <?php
   session_start();
-  
+
   $username = '';
-  $contrasena = '';
+  $password = '';
+  $id_usuario = '';
 
   if(isset($_POST['username'])&&isset($_POST['password'])){
       $username = $_POST['username'];
@@ -23,16 +24,23 @@
   if (mysqli_num_rows($ResultadoUsuario)>0){
     $Renglon = mysqli_fetch_assoc($ResultadoUsuario);            
     $_SESSION['username']=$username;
+    $_SESSION['password']=$password;
+    $_SESSION['id_usuario']=$Renglon['idMaestro'];
     $_SESSION['login']=1;
     header('Location: materias.php');
   }else{
     //echo "Usuario y/o  contrasena Incorrectos";
     $_SESSION['login']=0;
+    //$_SESSION['username']='';
+    //$_SESSION['password']='';
+    //$_SESSION['id_usuario']='';
   }
+
 
   //echo "Parametros por POST: ";
   //print_r($_POST);
     
+  //print_r($_SESSION);
 ?>
 
 

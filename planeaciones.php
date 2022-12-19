@@ -1,20 +1,46 @@
 <?php
-    session_start();
+  session_start();
 
-    //1. Establecer la conexion a la base de datos
-    if($_SESSION['login']=='0'){
-        header('Location: login.php');
-    }
+  //1. Establecer la conexion a la base de datos
+  if($_SESSION['login']=='0'){
+      header('Location: logout.php');
+  }
 
-    $Conexion=mysqli_connect('localhost','root','','mydb');
+  $Conexion=mysqli_connect('localhost','root','','mydb');
 
-    //1.1 Verificar que se pudo conectar a la base de datos
-    if(!$Conexion){
-        die("Error al conectarse a la base de datos: ".mysqli_connect_error());
-    }
+  //1.1 Verificar que se pudo conectar a la base de datos
+  if(!$Conexion){
+      die("Error al conectarse a la base de datos: ".mysqli_connect_error());
+  }
+
+  $idMaterias = $_GET['idMaterias'];
+  $idGrupo = $_GET['idGrupo'];
+  $idGrupoYMateria = $_GET['idGrupoYMateria'];
+
+  //2. Definimos la consulta a la base de datos
+  $ConsultaGrupos = "SELECT `grupo`.*, `grupoymateria`.*, `materias`.*, `maestro`.* FROM `grupo` 
+    LEFT JOIN `grupoymateria` ON `grupoymateria`.`Grupo_idGrupo` = `grupo`.`idGrupo` 
+    LEFT JOIN `materias` ON `grupoymateria`.`Materias_idMaterias` = `materias`.`idMaterias` 
+    LEFT JOIN `maestro` ON `grupoymateria`.`Maestro_idMaestro` = `maestro`.`idMaestro`
+    WHERE grupoymateria.Materias_idMaterias = '".$idMaterias."' AND `grupoymateria`.`Maestro_idMaestro` = '".$_SESSION['id_usuario']."' AND grupoymateria.Grupo_idGrupo = grupo.idGrupo;";
+  
+  $ConsultaMaterias = "SELECT `materias`.*, `maestro`.*, `grupoymateria`.* FROM `materias`, `maestro` 
+    LEFT JOIN `grupoymateria` ON `grupoymateria`.`Maestro_idMaestro` = `maestro`.`idMaestro`
+    WHERE `grupoymateria`.`Maestro_idMaestro` = '".$_SESSION['id_usuario']."' AND grupoymateria.Materias_idMaterias = materias.idMaterias;";
+
+  //3. Ejecutamos la consulta
+  $ResultadoGrupos = mysqli_query($Conexion, $ConsultaGrupos);
+  //print_r($ResultadoGrupos);
+
+  $ResultadoMaterias = mysqli_query($Conexion, $ConsultaMaterias);
+  //print_r($ResultadoGrupos);
+    
+  //echo "Parametros por POST: ";
+  //print_r($_POST);
+  //print_r($_SESSION);
+  //print_r($_GET);
     
 ?>
-
 
 <!DOCTYPE html>
 
@@ -159,42 +185,23 @@
 
           <ul class="menu-inner py-1">
             <!-- Dashboard -->
-            <li class="menu-item">
-                <a href="planeaciones.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Basic">Grupo 1</div>
-                </a>
-              </li>
-              <li class="menu-item">
-                <a href="planeaciones.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Basic">Grupo 2</div>
-                </a>
-              </li>
-              <li class="menu-item">
-                <a href="planeaciones.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Basic">Grupo 3</div>
-                </a>
-              </li>
-              <li class="menu-item">
-                <a href="planeaciones.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Basic">Grupo 4</div>
-                </a>
-              </li>
-              <li class="menu-item">
-                <a href="planeaciones.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Basic">Grupo 5</div>
-                </a>
-              </li>
-              <li class="menu-item">
-                <a href="planeaciones.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Basic">Grupo 6</div>
-                </a>
-              </li>
+            <?php
+              $idGrupoYMateria = 0;
+              while($RegistroGrupos = mysqli_fetch_assoc($ResultadoGrupos)){
+                //echo $idGrupoYMateria." ";
+                //echo "De la base de datos".$RegistroGrupos['idGrupoYMateria']." ";
+                if ($RegistroGrupos['idGrupoYMateria'] != $idGrupoYMateria) {
+                  $idGrupoYMateria = $RegistroGrupos['idGrupoYMateria'];
+                  echo '<li class="menu-item">';
+                    echo '<a href="planeaciones.php?idMaterias='.$idMaterias.'&idGrupo='.$RegistroGrupos['idGrupo'].'&idGrupoYMateria='.$RegistroGrupos['idGrupoYMateria'].'"" class="menu-link">';
+                      echo '<i class="menu-icon tf-icons bx bx-collection"></i>';
+                      echo '<div data-i18n="Basic">'.$RegistroGrupos['idGrupo'].'</div>';
+                    echo '</a>';                       
+                  echo '</li>';
+                }
+              }
+            ?>
+            
 
             <!-- Layouts -->
            
@@ -302,7 +309,7 @@
                       <div class="dropdown-divider"></div>
                     </li>
                     <li>
-                      <a class="dropdown-item" href="login.php">
+                      <a class="dropdown-item" href="logout.php">
                         <i class="bx bx-power-off me-2"></i>
                         <span class="align-middle">Salir</span>
                       </a>
@@ -317,421 +324,358 @@
           <!-- / Navbar -->
 
           <!-- Content wrapper -->
+          <div class="col-xl-11.">
+            <br>
+            <br>
+            
+            <div class="nav-align-top mb-4">
+              <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                  <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-planeaciones" aria-controls="navs-top-planeaciones aria-selected="true">
+                    Planeaciones
+                  </button>
+                </li>
+                <li class="nav-item">
+                  <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-actividades" aria-controls="navs-top-actividades" aria-selected="false">
+                    Actividades
+                  </button>
+                </li>
+                <li class="nav-item">
+                  <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-evaluaciones" aria-controls="navs-top-evaluaciones" aria-selected="false">
+                    Evaluaciones
+                  </button>
+                </li>
+                <li class="nav-item">
+                  <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-asistencia" aria-controls="navs-top-asistencia" aria-selected="false">
+                    Asistencia
+                  </button>
+                </li>
+              </ul>
+              <div class="tab-content">
+                <div class="tab-pane fade active show" id="navs-top-planeaciones" role="tabpanel">
+                  <h1>Planeación del Maestro:</h1>
+                  <?php
+                  if($RegistroMaterias = mysqli_fetch_assoc($ResultadoMaterias)){
+                    echo '<div class="mb-3 row">';
+                      echo '<label for="materiaId" class="col-md-2 col-form-label">Materia : </label> ';
+                      echo '<div class="col-md-3">';
+                        echo '<input type="text" style="width : 500px" class="form-control" id="materiaId" placeholder="'.$RegistroMaterias['nombre_materia'].'" aria-describedby="materiaId" disabled>';
+                      echo '</div>';
+                    echo '</div>';
+                  }
+                    echo '<div class="mb-3 row">';
+                      echo '<label for="materiaId" class="col-md-2 col-form-label">Grupo : </label> ';
+                      echo '<div class="col-md-3">';
+                        echo '<input type="text" style="width : 500px" class="form-control" id="materiaId" placeholder="'.$idGrupo.'" aria-describedby="materiaId" disabled>';
+                      echo '</div>';
+                    echo '</div>';
+                  ?>
+                  <div class="mb-3 row">
+                    <label for="html5-date-input" class="col-md-2 col-form-label">Fecha de inicio:</label>
+                    <div class="col-md-3">
+                      <input class="form-control" type="date" value="2021-06-18" id="html5-date-input">
+                    </div>
+                  </div>
+                  <div class="mb-3 row">
+                    <label for="html5-date-input" class="col-md-2 col-form-label">Fecha final:</label>
+                    <div class="col-md-3">
+                      <input class="form-control" type="date" value="2021-06-18" id="html5-date-input">
+                    </div>                 
+                  <br>
+                  <br>
+                  <div class="table-responsive text-nowrap">
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th>Fecha</th>
+                            <th>Materia</th>
+                            <th>Actividades</th>
+                          </tr>
+                        </thead>
+                        <tbody class="table-border-bottom-0">
+                          <tr>
+                            <td>08/11/2022</td>
+                            <td>Biologia</td>
+                            <td>Problemario</td>
+                          </tr>
+                          <tr>
+                            <td>09/11/2022 </td>
+                            <td>Español</td>
+                            <td>Practica</td>
+                          </tr>
+                          <tr>
+                            <td>10/11/2022</td>
+                            <td>Qumica</td>
+                            <td>Formulario</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <br>
+                      <br>
+                      <div class="tab-pane fade show active" id="horizontal-Planeaciones">
+                        <a href="administrador/pdf/pdfplaneacionesplaneaciones.php" class="btn btn-outline-primary">Descargar</a>
+                     </div>
+                    </div>
+                  </div>
+                  
+                             
+                    <!--Planeaciones-->
+                  
+                </div>
+                <div class="tab-pane fade" id="navs-top-actividades" role="tabpanel">
+                 <!--Actividades-->
+                 <div class="table-responsive text-nowrap">
+                 <h1>Actividades: </h1>
+                 <?php
+                  if($RegistroMaterias){
+                    echo '<div class="mb-3 row">';
+                      echo '<label for="materiaId" class="col-md-2 col-form-label">Materia : </label> ';
+                      echo '<div class="col-md-3">';
+                        echo '<input type="text" style="width : 500px" class="form-control" id="materiaId" placeholder="'.$RegistroMaterias['nombre_materia'].'" aria-describedby="materiaId" disabled>';
+                      echo '</div>';
+                    echo '</div>';
+                  }
+                    echo '<div class="mb-3 row">';
+                      echo '<label for="materiaId" class="col-md-2 col-form-label">Grupo : </label> ';
+                      echo '<div class="col-md-3">';
+                        echo '<input type="text" style="width : 500px" class="form-control" id="materiaId" placeholder="'.$idGrupo.'" aria-describedby="materiaId" disabled>';
+                      echo '</div>';
+                    echo '</div>';
+                  ?>
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Fecha de entrega:</th>
+                        <th>Actividad:</th>
+                        <th></th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0">
+                      <tr>
+                        <td>08/11/2022</td>
+                        <td>Actividad 1</td>
+                        <td>
+                          <div class="tab-pane fade show active" id="horizontal-Planeaciones">
+                            <a href="planeaciones_edit.html" class="btn btn-outline-primary">Editar</a> 
+                          </div>
+                        <td>
+                          <div class="tab-pane fade show active" id="horizontal-Planeaciones">
+                            <a href="javascript:void(0)" class="btn btn-outline-primary">Eliminar</a>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>08/11/2022</td>
+                        <td>Actividad 2</td>
+                        <td>
+                          <div class="tab-pane fade show active" id="horizontal-Planeaciones">
+                            <a href="planeaciones_edit.html" class="btn btn-outline-primary">Editar</a> 
+                          </div>
+                        </td>
+                        <td>
+                          <div class="tab-pane fade show active" id="horizontal-Planeaciones">
+                            <a href="javascript:void(0)" class="btn btn-outline-primary">Eliminar</a>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>08/11/2022</td>
+                        <td>Actividad 3</td>
+                        <td>
+                          <div class="tab-pane fade show active" id="horizontal-Planeaciones">
+                            <a href="planeaciones_edit.html" class="btn btn-outline-primary">Editar</a> 
+                          </div>
+                        </td>
+                        <td>
+                          <div class="tab-pane fade show active" id="horizontal-Planeaciones">
+                          <a href="javascript:void(0)" class="btn btn-outline-primary">Eliminar</a>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#edit">
+                  Agregar
+                </button>
+                 <!--Actividades-->
+                </div>
+                
+                <div class="tab-pane fade" id="navs-top-evaluaciones" role="tabpanel">
+                 <!--Evaluaciones-->
+                 <h1>Evaluaciones: </h1>
+                 <?php
+                  if($RegistroMaterias){
+                    echo '<div class="mb-3 row">';
+                      echo '<label for="materiaId" class="col-md-2 col-form-label">Materia : </label> ';
+                      echo '<div class="col-md-3">';
+                        echo '<input type="text" style="width : 500px" class="form-control" id="materiaId" placeholder="'.$RegistroMaterias['nombre_materia'].'" aria-describedby="materiaId" disabled>';
+                      echo '</div>';
+                    echo '</div>';
+                  }
+                    echo '<div class="mb-3 row">';
+                      echo '<label for="materiaId" class="col-md-2 col-form-label">Grupo : </label> ';
+                      echo '<div class="col-md-3">';
+                        echo '<input type="text" style="width : 500px" class="form-control" id="materiaId" placeholder="'.$idGrupo.'" aria-describedby="materiaId" disabled>';
+                      echo '</div>';
+                    echo '</div>';
+                  ?> 
+                  <div class="table-responsive text-nowrap">
+                    <table class="table">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Nombre del Alumno</th>
+                          <th>Act 1</th>
+                          <th>Act 2</th>
+                          <th>Parcial 1</th>
+                          <th>Act 1</th>
+                          <th>Act 2</th>
+                          <th>Parcial 2</th>
+                          <th>Promedio</th>
+                        </tr>
+                      </thead>
+                      <tbody class="table-border-bottom-0">
+                        <tr>
+                          <td>Axel</td>
+                          <td>1</td>
+                          <td>2</td>
+                          <td>3</td>
+                          <td>4</td>
+                          <td>5</td>
+                          <td>6</td>
+                          <td>7</td>
+                        </tr>
+                        <tr>
+                          <td>Axel</td>
+                          <td>1</td>
+                          <td>2</td>
+                          <td>3</td>
+                          <td>4</td>
+                          <td>5</td>
+                          <td>6</td>
+                          <td>7</td>
+                        </tr>
+                        <tr>
+                         
+                         
+                          <td>Axel</td>
+                          <td>1</td>
+                          <td>2</td>
+                          <td>3</td>
+                          <td>4</td>
+                          <td>5</td>
+                          <td>6</td>
+                          <td>7</td>
+                        </tr>
+                        <tr>
+                          <td>Axel</td>
+                          <td>1</td>
+                          <td>2</td>
+                          <td>3</td>
+                          <td>4</td>
+                          <td>5</td>
+                          <td>6</td>
+                          <td>7</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="card">
+                </div>
+                 <!--Evaluaciones-->
+                </div>
+                
+                <div class="tab-pane fade" id="navs-top-asistencia" role="tabpanel">
+                 <!---Asistencia-->
+                 <h1>Asistencia: </h1>
+                 <?php
+                  if($RegistroMaterias){
+                    echo '<div class="mb-3 row">';
+                      echo '<label for="materiaId" class="col-md-2 col-form-label">Materia : </label> ';
+                      echo '<div class="col-md-3">';
+                        echo '<input type="text" style="width : 500px" class="form-control" id="materiaId" placeholder="'.$RegistroMaterias['nombre_materia'].'" aria-describedby="materiaId" disabled>';
+                      echo '</div>';
+                    echo '</div>';
+                  }
+                    echo '<div class="mb-3 row">';
+                      echo '<label for="materiaId" class="col-md-2 col-form-label">Grupo : </label> ';
+                      echo '<div class="col-md-3">';
+                        echo '<input type="text" style="width : 500px" class="form-control" id="materiaId" placeholder="'.$idGrupo.'" aria-describedby="materiaId" disabled>';
+                      echo '</div>';
+                    echo '</div>';
+                  ?> 
+                  <h6 class="card-header">A - Asistencia, F - Falta, R - Retardo</h6>
+                  <div class="table-responsive text-nowrap">
+                    <table class="table">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Nombre del Alumno</th>
+                          <th>1</th>
+                          <th>2</th>
+                          <th>3</th>
+                          <th>4</th>
+                          <th>5</th>
+                          <th>6</th>
+                          <th>7</th>
+                        </tr>
+                      </thead>
+                      <tbody class="table-border-bottom-0">
+                        <tr>
+                          <td>Axel</td>
+                          <td>A</td>
+                          <td>F</td>
+                          <td>R</td>
+                          <td>F</td>
+                          <td>F</td>
+                          <td>A</td>
+                          <td>A</td>
+                        </tr>
+                        <tr>
+                          <td>Alex</td>
+                          <td>A</td>
+                          <td>F</td>
+                          <td>F</td>
+                          <td>R</td>
+                          <td>A</td>
+                          <td>F</td>
+                          <td>A</td>
+                        </tr>
+                        <tr>
+                          <td>Juan</td>
+                          <td>A</td>
+                          <td>F</td>
+                          <td>F</td>
+                          <td>F</td>
+                          <td>F</td>
+                          <td>F</td>
+                          <td>F</td>
+                        </tr>
+                        <tr>
+                          <td>Hugo</td>
+                          <td>A</td>
+                          <td>F</td>
+                          <td>R</td>
+                          <td>R</td>
+                          <td>R</td>
+                          <td>R</td>
+                          <td>R</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="card">
+                </div>
+                 <!---Asistencia-->
+                </div>
+              </div>
+            </div>
+          </div>
+          
           <div class="content-wrapper">
             <!-- Content -->
 
-            <div class="container-xxl flex-grow-1 container-p-y">
-              <div class="row">
-                <!-- Materia 1-->
-                <div class="card mb-4">
-                   
-                    <div class="card-body">
-                      <div class="row">
-                        <!-- Custom content with heading -->
-                        
-                        <div class="col-lg-12">
-                       
-                          <div class="demo-inline-spacing mt-3">
-                            <div class="list-group list-group-horizontal-md text-md-center">
-                              <a
-                                class="list-group-item list-group-item-action active"
-                                id="home-list-item"
-                                data-bs-toggle="list"
-                                href="#horizontal-Planeaciones"
-                                >Planeaciones</a
-                              >
-                              <a
-                                class="list-group-item list-group-item-action"
-                                id="profile-list-item"
-                                data-bs-toggle="list"
-                                href="#horizontal-Actividades"
-                                >Actividades</a
-                              >
-                              <a
-                                class="list-group-item list-group-item-action"
-                                id="messages-list-item"
-                                data-bs-toggle="list"
-                                href="#horizontal-Evaluaciones"
-                                >Evaluaciones</a
-                              >
-                              <a
-                                class="list-group-item list-group-item-action"
-                                id="settings-list-item"
-                                data-bs-toggle="list"
-                                href="#horizontal-Asistencia"
-                                >Asistencia</a
-                              >
-                            </div>
-                            <div class="tab-content px-0 mt-0">
-                              <div class="tab-pane fade show active" id="horizontal-Planeaciones">
-                                <h1>Planeación por Maestro:</h1>
-                                <!--<input type="text" style="width : 1px; heigth : 1px">-->
-                                <div class="mb-3 row">
-                                <label for="materiaId" class="col-md-2 col-form-label">Materia : </label> 
-                                <div class="col-md-3">
-                                  <input type="text" style="width : 500px" class="form-control" id="materiaId" placeholder="Materia 1" aria-describedby="materiaId" disabled>
-                                </div>
-                              </div>
-                                <div class="mb-3 row">
-                                <label for="grupoId" class="col-md-2 col-form-label">Grupo : </label> 
-                                <div class="col-md-3">
-                                  <input type="text" style="width : 500px" class="form-control" id="grupoId" placeholder="Grupo 1" aria-describedby="grupoId" disabled>
-                                </div>
-                              </div>
-
-                              <div class="mb-3 row">
-                                <label for="html5-date-input" class="col-md-2 col-form-label">Fecha de inicio:</label>
-                                <div class="col-md-3">
-                                  <input class="form-control" type="date" value="2021-06-18" id="html5-date-input">
-                                </div>
-                              </div>
-                              <div class="mb-3 row">
-                                <label for="html5-date-input" class="col-md-2 col-form-label">Fecha final:</label>
-                                <div class="col-md-3">
-                                  <input class="form-control" type="date" value="2021-06-18" id="html5-date-input">
-                                </div>
-                                <br>
-                                <br>
-                               <div class="col-md-8">
-                                <div class="card">
-                                  <div class="table-responsive text-nowrap">
-                                  <h5>Martes 08/11/2022</h5>
-
-                                    <table class="table table-borderless">
-                                      <thead>
-                                        <tr>
-                                          <th>Actividades</th>
-                                          <th>Recursos</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                        <tr>
-                                          <td>Cuestionario</td>
-                                          <td>Material por defecto</td>
-                                        </tr>
-                                      </tbody>
-                                    </table>
-
-                                  </div>
-                                </div>
-                              </div>
-                              <br>
-                              <br>
-
-                              <div class="col-md-8">
-                                <div class="card">
-                                  <div class="table-responsive text-nowrap">
-                                  <h5>Miércoles 09/11/2022</h5>
-                                    
-                                  <table class="table table-borderless">
-                                    <thead>
-                                      <tr>
-                                        <th>Actividades</th>
-                                        <th>Recursos</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      <tr>
-                                        <td>Cuestionario</td>
-                                        <td>Material por defecto</td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                    
-                                  </div>
-                                </div>
-                              </div>
-                              <br>
-                              <br>
-                              <div class="col-md-8">
-                                <div class="card">
-                                  <div class="table-responsive text-nowrap">
-                                  <h5>Jueves 10/11/2022</h5>
-                                    
-                                  <table class="table table-borderless">
-                                    <thead>
-                                      <tr>
-                                        <th>Actividades</th>
-                                        <th>Recursos</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      <tr>
-                                        <td>Cuestionario</td>
-                                        <td>Material por defecto</td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-
-                                  </div>
-                                </div>
-                              </div>  
-                             </div>
-                                <div class="tab-pane fade show active" id="horizontal-Planeaciones">
-                                 <a href="javascript:void(0)" class="btn btn-outline-primary">Descargar</a>
-                              </div>
-                              </div>
-                              <div class="tab-pane fade" id="horizontal-Actividades">
-                                
-                                
-                                <div class="col-md-8">
-                                  <div class="card">
-                                    <div class="table-responsive text-nowrap">
-                                    <h5><box-icon name='receipt'></box-icon> Actividad 1</h5>
-                                      <center>
-                                          </center><table class="table table-borderless">
-                                        <thead>
-                                          <tr>
-                                            <th>Entrega: 18 Octubre</th>
-                                            <th>       <div class="tab-pane fade show active" id="horizontal-Planeaciones">
-                                              <a href="planeaciones_edit.html" class="btn btn-outline-primary">Editar</a> 
-                                           </div> </th>
-                                           <th>       <div class="tab-pane fade show active" id="horizontal-Planeaciones">
-                                            <a href="javascript:void(0)" class="btn btn-outline-primary">Eliminar</a>
-                                         </div> </th>
-                                      
-                                            
-                                          </tr>
-                                        </thead>
-                                        <tbody>
-                                          <tr>
-                                         
-                                          </tr>
-                                          
-                                        </tbody>
-                                      </table>
-                                    </div>
-                                  </div>
-                                </div> 
-                                <div class="col-md-8">
-                                  <div class="card">
-                                    <div class="table-responsive text-nowrap">
-                                    <h5><box-icon name='receipt'></box-icon> Actividad 2</h5>
-                                      <center>
-                                          </center><table class="table table-borderless">
-                                        <thead>
-                                          <tr>
-                                            <th>Entrega: 19 Octubre</th>
-                                            <th>       <div class="tab-pane fade show active" id="horizontal-Planeaciones">
-
-                                              <a href="planeaciones_edit.html" class="btn btn-outline-primary">Editar</a> 
-                                           </div> </th>
-                                           <th>       <div class="tab-pane fade show active" id="horizontal-Planeaciones">
-                                            <a href="javascript:void(0)" class="btn btn-outline-primary">Eliminar</a>
-                                         </div> </th>
-                                      
-                                            
-                                          </tr>
-                                        </thead>
-                                        <tbody>
-                                          <tr>
-                                         
-                                          </tr>
-                                          
-                                        </tbody>
-                                      </table>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div class="col-md-8">
-                                  <div class="card">
-                                    <div class="table-responsive text-nowrap">
-                                    <h5><box-icon name='receipt'></box-icon> Actividad 3</h5>
-                                      <center>
-                                          </center><table class="table table-borderless">
-                                        <thead>
-                                          <tr>
-                                            <th>Entrega: 20 Octubre</th>
-                                            <th>       <div class="tab-pane fade show active" id="horizontal-Planeaciones">
-                                              <a href="planeaciones_edit.html" class="btn btn-outline-primary">Editar</a> 
-                                             
-                                           </div> </th>
-                                           <th>       <div class="tab-pane fade show active" id="horizontal-Planeaciones">
-                                            <a href="javascript:void(0)" class="btn btn-outline-primary">Eliminar</a>
-                                         </div> </th>
-                                      
-                                            
-                                          </tr>
-                                        </thead>
-                                        <tbody>
-                                          <tr>
-                                         
-                                          </tr>
-                                          
-                                        </tbody>
-                                      </table>
-                                    </div>
-                                  </div>
-                                  <br><br><br>
-                                </div> 
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#edit">
-                                  Agregar
-                                </button>
-                              </div>
-                              <div class="tab-pane fade" id="horizontal-Evaluaciones">
-                                <div class="card">
-                            
-                                  <h6 class="card-header">Materia: <input type="text" class="form-control" id="defaultFormControlInput" placeholder="Materia 1" aria-describedby="defaultFormControlHelp" disabled> </h6>
-                                  <h6 class="card-header">Grupo: <input type="text" class="form-control" id="defaultFormControlInput" placeholder="Grupo 1" aria-describedby="defaultFormControlHelp" disabled> </h6>
-                                  <div class="table-responsive text-nowrap">
-                                    <table class="table">
-                                      <thead class="table-light">
-                                        <tr>
-                                          <th>Nombre del Alumno</th>
-                                          <th>Act 1</th>
-                                          <th>Act 2</th>
-                                          <th>Parcial 1</th>
-                                          <th>Act 1</th>
-                                          <th>Act 2</th>
-                                          <th>Parcial 2</th>
-                                          <th>Promedio</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody class="table-border-bottom-0">
-                                        <tr>
-                                          <td>Axel</td>
-                                          <td>1</td>
-                                          <td>2</td>
-                                          <td>3</td>
-                                          <td>4</td>
-                                          <td>5</td>
-                                          <td>6</td>
-                                          <td>7</td>
-                                        </tr>
-                                        <tr>
-                                          <td>Axel</td>
-                                          <td>1</td>
-                                          <td>2</td>
-                                          <td>3</td>
-                                          <td>4</td>
-                                          <td>5</td>
-                                          <td>6</td>
-                                          <td>7</td>
-                                        </tr>
-                                        <tr>
-                                         
-                                         
-                                          <td>Axel</td>
-                                          <td>1</td>
-                                          <td>2</td>
-                                          <td>3</td>
-                                          <td>4</td>
-                                          <td>5</td>
-                                          <td>6</td>
-                                          <td>7</td>
-                                        </tr>
-                                        <tr>
-                                          <td>Axel</td>
-                                          <td>1</td>
-                                          <td>2</td>
-                                          <td>3</td>
-                                          <td>4</td>
-                                          <td>5</td>
-                                          <td>6</td>
-                                          <td>7</td>
-                                        </tr>
-                                      </tbody>
-                                    </table>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="tab-pane fade" id="horizontal-Asistencia">
-                                <div class="card">
-                            
-                                  <h6 class="card-header">Materia: <input type="text" class="form-control" id="defaultFormControlInput" placeholder="Materia 1" aria-describedby="defaultFormControlHelp" disabled> </h6>
-                                  <h6 class="card-header">Grupo: <input type="text" class="form-control" id="defaultFormControlInput" placeholder="Grupo 1" aria-describedby="defaultFormControlHelp" disabled> </h6>
-                                  <h6 class="card-header">A - Asistencia,     F - Falta,     R - Retardo
-                                  </h6>
-                                  
-                                  <div class="table-responsive text-nowrap">
-                                    <table class="table">
-                                      <thead class="table-light">
-                                        <tr>
-                                          <th>Nombre del Alumno</th>
-                                          <th>1</th>
-                                          <th>2</th>
-                                          <th>3</th>
-                                          <th>4</th>
-                                          <th>5</th>
-                                          <th>6</th>
-                                          <th>7</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody class="table-border-bottom-0">
-                                        <tr>
-                                          <td>Axel</td>
-                                          <td>A</td>
-                                          <td>F</td>
-                                          <td>R</td>
-                                          <td>F</td>
-                                          <td>F</td>
-                                          <td>A</td>
-                                          <td>A</td>
-                                        </tr>
-                                        <tr>
-                                          <td>Alex</td>
-                                          <td>A</td>
-                                          <td>F</td>
-                                          <td>F</td>
-                                          <td>R</td>
-                                          <td>A</td>
-                                          <td>F</td>
-                                          <td>A</td>
-                                        </tr>
-                                        <tr>
-                                         
-                                         
-                                          <td>Juan</td>
-                                          <td>A</td>
-                                          <td>F</td>
-                                          <td>F</td>
-                                          <td>F</td>
-                                          <td>F</td>
-                                          <td>F</td>
-                                          <td>F</td>
-                                        </tr>
-                                        <tr>
-                                          <td>Hugo</td>
-                                          <td>A</td>
-                                          <td>F</td>
-                                          <td>R</td>
-                                          <td>R</td>
-                                          <td>R</td>
-                                          <td>R</td>
-                                          <td>R</td>
-                                        </tr>
-                                      </tbody>
-                                    </table>
-                                  </div>
-                                </div>
-                              </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <!--/ Custom content with heading -->
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                </div>
-                <!-- Total Revenue -->
-                
-                <!--/ Total Revenue -->
-                <div class="col-12 col-md-8 col-lg-4 order-3 order-md-2">
-                  <div class="row">
-                    <div class="col-6 mb-4">
-                    
-                    </div>
-                  
-                    <!-- </div>
-    <div class="row"> -->
-                    <div class="col-12 mb-4">
-                     
-                    </div>
-                  </div>
-                </div>
-              </div>
+          
+        
               <div class="row">
                 <!-- Order Statistics -->
                 <div class="col-md-6 col-lg-4 col-xl-4 order-0 mb-4">
@@ -748,23 +692,14 @@
                 <!--/ Transactions -->
               </div>
             </div>
+            </div>
+            
             <!-- / Content -->
 
             <!-- Footer -->
             <footer class="content-footer footer bg-footer-theme">
               <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
                 <div class="mb-2 mb-md-0">
-                  
-             
-                 
-                 
-                </div>
-                <div>
-              
-
-           
-
-                
                 </div>
               </div>
             </footer>
@@ -776,7 +711,8 @@
         </div>
         <!-- / Layout page -->
       </div>
-
+      </div>
+      
       <!-- Overlay -->
       <div class="layout-overlay layout-menu-toggle"></div>
     </div>
@@ -784,6 +720,57 @@
 
      
     <!-- Extra Large Modal -->
+    
+    <div class="modal fade" id="edit" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel4">Agregar Actividad</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              
+              <div class="col mb-3">
+                <label for="nameExLarge" class="form-label">Actividad</label>
+                <input type="text" id="nameExLarge" class="form-control" placeholder="Enter Name" />
+              </div>
+              <div class="col mb-3">
+                <label for="nameExLarge" class="form-label">Obejtivo</label>
+                <input type="text" id="nameExLarge" class="form-control" placeholder="Enter Name" />
+              </div>
+              <div class="col mb-3">
+                <label for="nameExLarge" class="form-label">Descripción</label>
+                <input type="text" id="nameExLarge" class="form-control" placeholder="Enter Name" />
+              </div>
+              
+              <div class="col mb-3">
+                <label for="nameExLarge" class="form-label">Recursos</label>
+                <input type="text" id="nameExLarge" class="form-control" placeholder="Enter Name" />
+              </div>
+              <div class="mb-3 row">
+                <label for="html5-date-input" class="col-md-2 col-form-label">Fecha de entrega:</label>
+                <div class="col-md-3">
+                  <input class="form-control" type="date" value="2021-06-18" id="html5-date-input">
+                </div>
+              </div>
+            </div>
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              Salir
+            </button>
+            <button type="button" class="btn btn-primary">Subir</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
     
     <div class="modal fade" id="edit" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-xl" role="document">
@@ -834,15 +821,7 @@
         </div>
       </div>
     </div>
-    
 
-
-   
-    
-
-    </body>
-  </div>
-  </div>
     <!-- Core JS -->
     <!-- build:js assets/vendor/js/core.js -->
     <script src="assets/vendor/libs/jquery/jquery.js"></script>
